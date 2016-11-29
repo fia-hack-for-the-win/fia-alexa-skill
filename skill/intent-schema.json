@@ -1,0 +1,34 @@
+{
+ "intents":[
+   {
+     "intent": "GetAlerts"
+   },
+   {
+      "intent" :"GetStatus"
+   },
+   {
+     "intent" : "GetRecommendations"
+   },
+   {
+     "intent": "GetActionDetails",
+     "slots": [
+        {
+          "name": "ActionName",
+          "type": "LIST_OF_ACTIONS"
+        }
+      ]
+   },
+   {
+     "intent": "AMAZON.HelpIntent"
+   },
+   {
+     "intent": "AMAZON.StopIntent"
+   },
+   {
+     "intent": "AMAZON.CancelIntent"
+   },
+   {
+     "intent": "ThankYou"
+   }
+ ] 
+}

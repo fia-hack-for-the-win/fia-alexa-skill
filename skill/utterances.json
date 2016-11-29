@@ -1,0 +1,14 @@
+GetAlerts tell me the current alerts
+GetAlerts get the current alerts
+
+GetStatus update me on the latest alert
+GetStatus guide me on the latest alert
+GetStatus guide me on the latest weather alert
+GetStatus guide me on the weather alert
+
+GetActionDetails how to {ActionName}
+GetActionDetails how should I {ActionName}
+GetActionDetails what can I do to {ActionName}
+
+ThankYou Thanks
+ThankYou Thank you
