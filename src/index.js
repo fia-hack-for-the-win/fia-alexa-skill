@@ -11,11 +11,12 @@ const Alexa = require('alexa-sdk');
 const doc = require('dynamodb-doc');
 const AWS = require('aws-sdk');
 
+// change it to match the region where dynamodb is stored
 AWS.config.update({region: 'us-west-2'});
 
 const dynamo = new doc.DynamoDB();
-const dynamo_table = "fia_notification_details";
-const zip_code = "29409";
+const dynamo_table = "test"; //"fia_notification_details";
+const default_zip_code = "29409";
 
 const APP_ID = "amzn1.ask.skill.39120fee-ee48-4f40-9ab7-c97552d138eb";  
 
@@ -57,29 +58,40 @@ const handlers = {
         this.emit(':ask', speechOutput, reprompt);
     },
     'GetStatus': function() {
-        // TODO: get the status for the most important current alert
         var thisFn = this;
+        
+        var zipCode = this.event.request.intent.slots.ZipCode; 
+        var zipCodeVal = "-";
+        if (zipCode && zipCode.value) {
+            zipCodeVal = "" + zipCode.value;
+        }
+        if (zipCodeVal === "-") {
+            zipCodeVal = default_zip_code;
+        }
+        
         var params = { 
             TableName: dynamo_table,
             Key: {
-                "zipcode": zip_code
+                "zipcode": zipCodeVal
             }
         };
         dynamo.getItem(
                     params, function(err, data) {
                         if (err) {
                             console.log(err);
+                            thisFn.emit(':ask', "Something went wong with this request. Do you mind asking me again ? ");
                             return;
                         }
                         console.log(data);
+                        if (data.Item === null || typeof(data.Item) === "undefined") {
+                            thisFn.emit(':tell', "Great news, there's no alerts at ZIP <say-as interpret-as='digits'>" + zipCodeVal + "</say-as> ! Your current recommendation is to sit back and have ! a ! beer ! ");
+                            return;
+                        }
                         var current_alert = data.Item;
                         var current_status = "There's a " + current_alert.severity + " " + current_alert.event + " in your location ! ";
                         var current_recomm = "The current recommendation is to " + current_alert.responseType +
                                               ". If you want more help say: how to " + current_alert.responseType + " ? ";
-                        // var currentStatus = "There's a severe Huricane Warning in your location ! ";
-                        // var currentRecommendation = " The current recommendation is to evacuate. If you want more help say: how to evacuate ?";
                         
-                        // TODO: get recommendations for the current alert
                         var speech_output =  current_status + current_recomm;
                         thisFn.emit(':ask', speech_output, current_recomm);
                     });
