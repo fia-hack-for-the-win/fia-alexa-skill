@@ -4,7 +4,13 @@
      "intent": "GetAlerts"
    },
    {
-      "intent" :"GetStatus"
+      "intent" :"GetStatus",
+      "slots": [
+        {
+          "name": "ZipCode",
+          "type": "AMAZON.NUMBER"
+        }        
+      ]
    },
    {
      "intent" : "GetRecommendations"
