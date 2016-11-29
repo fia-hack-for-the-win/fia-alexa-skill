@@ -2,6 +2,7 @@ GetAlerts tell me the current alerts
 GetAlerts get the current alerts
 
 GetStatus update me on the latest alert
+GetStatus update me on the latest alert for {ZipCode}
 GetStatus guide me on the latest alert
 GetStatus guide me on the latest weather alert
 GetStatus guide me on the weather alert
