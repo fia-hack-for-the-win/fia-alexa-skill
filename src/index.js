@@ -8,6 +8,14 @@
 'use strict';
 
 const Alexa = require('alexa-sdk');
+const doc = require('dynamodb-doc');
+const AWS = require('aws-sdk');
+
+AWS.config.update({region: 'us-west-2'});
+
+const dynamo = new doc.DynamoDB();
+const dynamo_table = "fia_notification_details";
+const zip_code = "29409";
 
 const APP_ID = "amzn1.ask.skill.39120fee-ee48-4f40-9ab7-c97552d138eb";  
 
@@ -50,12 +58,31 @@ const handlers = {
     },
     'GetStatus': function() {
         // TODO: get the status for the most important current alert
-        var currentStatus = "There's a severe Huricane Warning in your location ! ";
-        var currentRecommendation = " The current recommendation is to evacuate. If you want more help say: how to evacuate ?";
-        // TODO: get recommendations for the current alert
-        var speechOutput =  currentStatus + currentRecommendation;
-        
-        this.emit(':ask', speechOutput, currentRecommendation);
+        var thisFn = this;
+        var params = { 
+            TableName: dynamo_table,
+            Key: {
+                "zipcode": zip_code
+            }
+        };
+        dynamo.getItem(
+                    params, function(err, data) {
+                        if (err) {
+                            console.log(err);
+                            return;
+                        }
+                        console.log(data);
+                        var current_alert = data.Item;
+                        var current_status = "There's a " + current_alert.severity + " " + current_alert.event + " in your location ! ";
+                        var current_recomm = "The current recommendation is to " + current_alert.responseType +
+                                              ". If you want more help say: how to " + current_alert.responseType + " ? ";
+                        // var currentStatus = "There's a severe Huricane Warning in your location ! ";
+                        // var currentRecommendation = " The current recommendation is to evacuate. If you want more help say: how to evacuate ?";
+                        
+                        // TODO: get recommendations for the current alert
+                        var speech_output =  current_status + current_recomm;
+                        thisFn.emit(':ask', speech_output, current_recomm);
+                    });
     },
     'GetActionDetails': function () {
         console.log("Source event:" + JSON.stringify(this.event));
@@ -101,4 +128,3 @@ exports.handler = (event, context) => {
     alexa.registerHandlers(handlers);
     alexa.execute();
 };
-
